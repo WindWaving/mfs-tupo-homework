@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+
+<body>
+  <h1>用户注册</h1>
+  <form id="form" name="form">
+    <div>
+      <label for="name">用户名：</label>
+      <input type="text" id="name" name="name">
+    </div>
+    <div>
+      <label for="psd">密码：</label>
+      <input type="password" name="psd" id="psd">
+    </div>
+    <div>
+      <button type="button" onclick="post()">提交</button>
+    </div>
+  </form>
+</body>
+<script>
+  function post() {
+    var fname = $("#name").val();
+    var fpsd = $("psd").val();
+    $.ajax({
+      url: "http://www.b.com:3000/formtest",
+      type: "post",
+      data: {
+        name: fname,
+        psd: fpsd
+      },
+      success: function (data) {
+        console.log(data);
+      },
+      error: function (e) {
+        console.log(e);
+      }
+    })
+  }
+
+</script>
+
+</html>
