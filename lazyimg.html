@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LazyImg</title>
+    <script src="jquery-1.11.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+    <style>
+        html,
+        body {
+            width: 100%;
+        }
+
+        .text {
+            height: 700px;
+            width: 100%;
+        }
+
+        img {
+            width: 600px;
+            height: 400px;
+            background: coral;
+            ;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="text">
+        <h1>图片懒加载</h1>
+        <p>img元素在页面加载时并不加载实际的图片,</p>
+        <p>只有当图片出现在浏览器的可视区域内时，才设置图片正真的路径，让图片显示出来。</p>
+        <p>向下滑动滚轮，会有懒加载的图片</p>
+    </div>
+
+    <!-- <div class=""> -->
+    <img data-src="imgs/lazy.jpg">
+    <!-- </div> -->
+
+</body>
+<script>
+    function LazyImg(node) {
+        var timer;
+        isShow = function () {
+            if ($(node).offset.top + $(node).height() >= $(document).scrollTop()
+                && $(node).offset.top <= $(document).scrollTop() + $(window).height()) {
+                return true;
+            }
+            return false;
+        }
+
+        window.onscroll = function () {
+            timer = setTimeout(function () {
+                if (isShow) {
+                    // console.log(this.node);
+                    node.attr("src", node.data('src'));
+                }
+            }, 50)
+        }
+
+    }
+
+</script>
+<script>
+    new LazyImg($("img"));
+</script>
+</html>

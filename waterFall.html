@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News WaterFall</title>
+    <script src="jquery-1.11.0.min.js"></script>
+    <style>
+        body {
+            position: relative;
+        }
+
+        .box {
+            width: 300px;
+            padding: 10px 20px;
+            border: 1px solid gray;
+            background: rgb(250, 236, 219);
+            position: absolute;
+            margin: 10px 20px;
+            box-sizing: border-box;
+        }
+
+        .box img {
+            width: 100%;
+        }
+
+        .box a {
+            display: block;
+        }
+
+        .box a,
+        .box h2,
+        .box p {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+<script>
+
+    function getNews() {
+        var newslist = [];
+        var datalist = [];
+        $.ajax({
+            url: "https://learning-api.mafengshe.com/news",
+            async: false,
+            success: function (data) {
+                newslist = data.result.data.list;
+                for (var i = 0; i < newslist.length; ++i) {
+                    var news = { url: "", pic: "", title: "", summary: "" };
+                    news.url = newslist[i].URL;
+                    try {
+                        news.pic = newslist[i].allPics.pics[0].imgurl;
+                    } catch (e) {
+                    }
+                    news.title = newslist[i].title;
+                    news.summary = newslist[i].summary;
+                    datalist.push(news);
+                }
+
+            }
+        })
+        return datalist;
+    }
+    //动态生成元素
+    function createItem(data) {
+        var $box = $("<div class='box'></div>");
+        var $a = $("<a href=" + data.url + "></a>");
+        var $img = $("<img src=" + data.pic + ">");
+        $a.append($img);
+        var $title = $("<h2>" + data.title + "</h2>");
+        $a.append($title);
+        var $summary = $("<p>" + data.summary + "</p>");
+        $a.append($summary);
+        $box.append($a);
+        $("body").append($box);
+        console.log($box.height());
+        return $box;
+    }
+    var cols = 7;
+    var heights = new Array(cols);
+    //初始化高度为0
+    function initCols() {
+        for (var i = 0; i < cols; ++i) {
+            heights[i] = 0;
+        }
+    }
+    //返回最小高度的一列
+    function getMinCol() {
+        minCol = 0;
+        for (var i = 0; i < cols; ++i) {
+            if (heights[i] < heights[minCol]) {
+                minCol = i;
+            }
+        }
+        return minCol;
+    }
+    function appendItem(minCol, $item) {
+        // $("body").append($item);
+        var width = $item.outerWidth(true);
+        $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
+        // setTimeout(() => {
+            heights[minCol] = heights[minCol] + $item.outerHeight(true);
+        // }, 1000);
+        // console.log(minCol, $item.outerHeight(true));
+    }
+    function getItem() {
+        var datalist = getNews();
+        initCols();
+        for (var i = 0; i < datalist.length; ++i) {
+            var minCol = getMinCol();
+            var $item = createItem(datalist[i]);
+            appendItem(minCol, $item);
+        }
+
+    }
+    getItem();
+</script>
+
+</html>
