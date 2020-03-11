@@ -7,17 +7,18 @@
     <title>News WaterFall</title>
     <script src="jquery-1.11.0.min.js"></script>
     <style>
-        body {
+        .container {
             position: relative;
+            /* width: 100%; */
         }
 
         .box {
-            width: 300px;
+            width: 250px;
             padding: 10px 20px;
             border: 1px solid gray;
             background: rgb(250, 236, 219);
             position: absolute;
-            margin: 10px 20px;
+            margin: 100px 20px;
             box-sizing: border-box;
         }
 
@@ -39,7 +40,7 @@
 </head>
 
 <body>
-
+    <div class="container"></div>
 </body>
 <script>
 
@@ -67,6 +68,7 @@
         })
         return datalist;
     }
+    var heights = [];
     //动态生成元素
     function createItem(data) {
         var $box = $("<div class='box'></div>");
@@ -78,20 +80,19 @@
         var $summary = $("<p>" + data.summary + "</p>");
         $a.append($summary);
         $box.append($a);
-        $("body").append($box);
-        console.log($box.height());
+        $(".container").append($box);
         return $box;
     }
-    var cols = 7;
-    var heights = new Array(cols);
+
     //初始化高度为0
-    function initCols() {
+    function initCols(cols) {
         for (var i = 0; i < cols; ++i) {
             heights[i] = 0;
         }
     }
     //返回最小高度的一列
-    function getMinCol() {
+    function getMinCol(cols) {
+        console.log(cols);
         minCol = 0;
         for (var i = 0; i < cols; ++i) {
             if (heights[i] < heights[minCol]) {
@@ -100,26 +101,30 @@
         }
         return minCol;
     }
+    //瀑布流
     function appendItem(minCol, $item) {
-        // $("body").append($item);
         var width = $item.outerWidth(true);
         $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
-        // setTimeout(() => {
-            heights[minCol] = heights[minCol] + $item.outerHeight(true);
-        // }, 1000);
-        // console.log(minCol, $item.outerHeight(true));
+        heights[minCol] = heights[minCol] + $item.outerHeight(true);
     }
     function getItem() {
+        $(".container").width($(window).width());
         var datalist = getNews();
-        initCols();
+        var contWidth = $(".container").width();
+        var cols = Math.floor(contWidth / 300);
+        heights = new Array(cols);
+        initCols(cols);
         for (var i = 0; i < datalist.length; ++i) {
-            var minCol = getMinCol();
+            var minCol = getMinCol(cols);
             var $item = createItem(datalist[i]);
             appendItem(minCol, $item);
         }
 
     }
     getItem();
+    $(window).on("resize", function () {
+        getItem();
+    })
 </script>
 
 </html>
