@@ -18,7 +18,7 @@
             border: 1px solid gray;
             background: rgb(250, 236, 219);
             position: absolute;
-            margin: 100px 20px;
+            margin: 10px 20px;
             box-sizing: border-box;
         }
 
@@ -80,7 +80,6 @@
         var $summary = $("<p>" + data.summary + "</p>");
         $a.append($summary);
         $box.append($a);
-        $(".container").append($box);
         return $box;
     }
 
@@ -92,7 +91,6 @@
     }
     //返回最小高度的一列
     function getMinCol(cols) {
-        console.log(cols);
         minCol = 0;
         for (var i = 0; i < cols; ++i) {
             if (heights[i] < heights[minCol]) {
@@ -102,10 +100,14 @@
         return minCol;
     }
     //瀑布流
-    function appendItem(minCol, $item) {
-        var width = $item.outerWidth(true);
-        $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
-        heights[minCol] = heights[minCol] + $item.outerHeight(true);
+    function appendItem(cols, $item) {
+        $item.children().first().find('img').load(function () {
+            minCol = getMinCol(cols);
+            $(".container").append($item);
+            var width = $item.outerWidth(true);
+            $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
+            heights[minCol] = heights[minCol] + $item.outerHeight(true);
+        })
     }
     function getItem() {
         $(".container").width($(window).width());
@@ -115,16 +117,19 @@
         heights = new Array(cols);
         initCols(cols);
         for (var i = 0; i < datalist.length; ++i) {
-            var minCol = getMinCol(cols);
             var $item = createItem(datalist[i]);
-            appendItem(minCol, $item);
+            appendItem(cols, $item);
         }
 
     }
     getItem();
-    $(window).on("resize", function () {
+    window.onresize = function () {
+        window.location.reload();
         getItem();
-    })
+    }
+    // $(window).on("resize", function () {
+    //     getItem();
+    // })
 </script>
 
 </html>
