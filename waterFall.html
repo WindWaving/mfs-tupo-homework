@@ -7,18 +7,22 @@
     <title>News WaterFall</title>
     <script src="jquery-1.11.0.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
         .container {
             position: relative;
-            /* width: 100%; */
         }
 
         .box {
-            width: 250px;
+            width: 500px;
             padding: 10px 20px;
             border: 1px solid gray;
             background: rgb(250, 236, 219);
             position: absolute;
-            margin: 10px 20px;
+            margin: 20px 30px;
             box-sizing: border-box;
         }
 
@@ -36,19 +40,60 @@
             color: black;
             text-decoration: none;
         }
+
+        .loadmore {
+            width: 500px;
+            height: 100px;
+            line-height: 100px;
+            text-align: center;
+            background: black;
+            color: white;
+            position: absolute;
+            font-size: 40px;
+
+        }
     </style>
 </head>
 
 <body>
-    <div class="container"></div>
+    <div class="container">
+    </div>
+    <div class="loadmore">加载更多</div>
+
 </body>
 <script>
+    var pagecnt = 1;
+    var timer;
+    var heights = [];
+    var cols;
+    window.onload = function () {
+        $(".container").width($(window).width());
+        var contWidth = $(".container").width();
+        cols = Math.floor(contWidth / 600);
+        heights = new Array(cols);
+        initCols(cols);
+        //生成新闻瀑布流
+        getNews(pagecnt++);
+    }
+    window.onscroll = function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            if (isShow()) {
+                getNews(pagecnt++);
+            }
+        }, 100);
 
-    function getNews() {
+    }
+    window.onresize = function () {
+        window.location.reload();
+        generateItem(5);
+    }
+    function getNews(pagenum) {
         var newslist = [];
         var datalist = [];
         $.ajax({
-            url: "https://learning-api.mafengshe.com/news",
+            url: "https://learning-api.mafengshe.com/news?page=" + pagenum + "&pagesize=10",
+            type: "GET",
             async: false,
             success: function (data) {
                 newslist = data.result.data.list;
@@ -63,12 +108,32 @@
                     news.summary = newslist[i].summary;
                     datalist.push(news);
                 }
-
+                //加载页面
+                loadPage(datalist);
+            },
+            error: function (error) {
+                console.log(error);
             }
         })
         return datalist;
     }
-    var heights = [];
+
+
+    //加载页面
+    function loadPage(datalist) {
+        for (var i = 0; i < datalist.length; ++i) {
+            //需要等待图片加载完毕再设置css
+            new Promise(function (resolve, reject) {
+                var $item = createItem(datalist[i]);
+                $item.children().first().find('img').load(function () {
+                    resolve($item);
+                });
+            }).then(function ($item) {
+                createWaterFall(cols, $item);
+            })
+        }
+    }
+
     //动态生成元素
     function createItem(data) {
         var $box = $("<div class='box'></div>");
@@ -83,6 +148,28 @@
         return $box;
     }
 
+
+
+    //图片加载完成后形成瀑布流
+    function createWaterFall(cols, $item) {
+        minCol = getMinCol(cols);
+        $(".container").append($item);
+        var width = $item.outerWidth(true);
+        $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
+        heights[minCol] = heights[minCol] + $item.outerHeight(true);
+        var $maxh = heights[Math.floor(cols / 2) - 1] > heights[Math.floor(cols / 2)] ? heights[Math.floor(cols / 2) - 1] : heights[Math.floor(cols / 2)];
+        $(".loadmore").css({ "top": $maxh + 50 + "px", "left": (Math.floor(cols / 2) - 0.5) * width + "px" });
+    }
+
+
+    //判断“加载更多”按钮是否在视口中
+    function isShow() {
+        if ($(".loadmore").offset().top + $(".loadmore").height() >= $(document).scrollTop()
+            && $(".loadmore").offset().top <= $(document).scrollTop() + $(window).height()) {
+            return true;
+        }
+        return false;
+    }
     //初始化高度为0
     function initCols(cols) {
         for (var i = 0; i < cols; ++i) {
@@ -99,37 +186,7 @@
         }
         return minCol;
     }
-    //瀑布流
-    function appendItem(cols, $item) {
-        $item.children().first().find('img').load(function () {
-            minCol = getMinCol(cols);
-            $(".container").append($item);
-            var width = $item.outerWidth(true);
-            $item.css({ "top": heights[minCol] + "px", "left": minCol * width + "px" });
-            heights[minCol] = heights[minCol] + $item.outerHeight(true);
-        })
-    }
-    function getItem() {
-        $(".container").width($(window).width());
-        var datalist = getNews();
-        var contWidth = $(".container").width();
-        var cols = Math.floor(contWidth / 300);
-        heights = new Array(cols);
-        initCols(cols);
-        for (var i = 0; i < datalist.length; ++i) {
-            var $item = createItem(datalist[i]);
-            appendItem(cols, $item);
-        }
 
-    }
-    getItem();
-    window.onresize = function () {
-        window.location.reload();
-        getItem();
-    }
-    // $(window).on("resize", function () {
-    //     getItem();
-    // })
 </script>
 
 </html>
