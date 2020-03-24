@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise</title>
+</head>
+
+<body>
+    <script>
+        function ajaxGet(url) {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", url);
+                xhr.send();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            console.log(url);
+                            resolve(url);
+                        } else {
+                            reject(xhr.response)
+                        }
+                    }
+                }
+            })
+        }
+        // function upCajax() {
+        //     var urls=[];
+        //     for(let i=1;i<=10;++i){
+        //         urls[i-1]="https://learning-api.mafengshe.com/news?page="+i+"";
+        //     }       
+        //     function visit(index){
+        //         console.log(index);
+        //         if(index>=10){return;}
+        //         ajaxGet(urls[index++]).then(function(index){
+        //             return visit(index);
+        //         })
+        //     }   
+        //     visit(0);       
+        // }
+        // upCajax();
+        function Cajax() {
+            ajaxGet("https://learning-api.mafengshe.com/news?page=1").then(function(){
+                console.log("req 1");
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=2");
+            }).then(function(){
+                console.log("req 2");
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=3");
+            }).then(function(){
+                console.log("req 3")
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=4");
+            }).then(function(){
+                console.log("req 4");
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=5");
+            }).then(function(){
+                console.log("req 5")
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=6");
+            }).then(function(){
+                console.log("req 6");
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=7");
+            }).then(function(){
+                console.log("req 7")
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=8");
+            }).then(function(){
+                console.log("req 8");
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=9");
+            }).then(function(){
+                console.log("req 9")
+                return ajaxGet("https://learning-api.mafengshe.com/news?page=10");
+            }).then(function(){
+                console.log("req 10");
+            })
+        }
+        var num = 0;
+        function doSuccess() {
+            ++num;
+            if(num>=10){
+                console.log("request finished ");
+            }
+        }
+        function Bajax() {
+            for (let i = 1; i <= 10; ++i) {
+                ajaxGet("https://learning-api.mafengshe.com/news?page=" + i + "").then(function (data) {
+                    console.log("req " + i),data;
+                    doSuccess();
+                })
+            }
+
+        }
+        var baseurl="https://learning-api.mafengshe.com/news?page=";
+        //generator函数
+        function *gen(){
+            for(let i=1;i<=10;++i){
+                yield ajaxGet(baseurl+i+"");
+            }
+            return;
+        }
+        //Promise+Generator+串行发送
+        function PGCajax(){
+            var g=gen();
+            function next(){
+                var res=g.next();
+                if(res.done){return;}
+                console.log(res.value);
+                res.value.then(function(){
+                    next();
+                });
+            }
+            next();
+        }
+        //Promise+Generator+并行发送
+        function *gen(){
+            var urls=[];
+            for(let i=1;i<=10;++i){
+                urls[i]=baseurl+i+"";
+            }
+            let pro=urls.map(item=>ajaxGet(item));
+            yield Promise.all(pro);
+            return;
+        }
+        function PGBajax(){
+            var g=gen();
+            g.next();
+        }
+        // PGBajax();
+
+    </script>
+</body>
+
+</html>

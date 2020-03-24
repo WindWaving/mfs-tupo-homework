@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <style>
+        *{
+            font-size: 2rem;
+        }
+        body{
+            padding: 3rem;
+            box-sizing: border-box;
+        }
+        .folder{
+            color: rgb(182, 88, 12);
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <treelist :treelist="treelist"></treelist>
+    </div>
+
+</body>
+<script>
+    let treelist={
+        name:"treelist",
+        children:[
+            {
+                name:'1',
+                children:[
+                    {
+                        name:'1.1',
+                        children:[
+                            {
+                                name:'1.1.1',
+                                children:null
+                            },
+                            {
+                                name:'1.1.2',
+                                children:null
+                            }
+                        ]
+                    },
+                    {
+                        name:'1.2',
+                        children:[
+                            {
+                                name:'1.2.1',
+                                children:null
+                            }
+                        ]
+                    },
+                    {
+                        name:'1.3',
+                        children:null
+                    }
+                ]
+            },
+            {
+                name:'2',
+                children:null
+            }
+        ]
+    }
+
+    Vue.component('treelist',{
+        props:['treelist'],
+        template:'<ul>\
+            <li>\
+            <span :class="{folder:hasChild}"  @click="showChild()">{{treelist.name}}</span>\
+            <treelist v-for="item in treelist.children" :treelist="item" v-if="show"></treelist>\
+            </li>\
+            </ul>',
+        data(){
+            return{
+                show:false
+            }
+        },    
+        computed: {
+            hasChild:function () {
+                return this.treelist.children;
+            }
+        },
+        methods:{
+            showChild:function(){
+                if(this.hasChild){
+                    if(this.show){
+                        this.show=false;
+                    }else{
+                        this.show=true;
+                    }
+                }
+            }
+        }
+    })
+    new Vue({
+        el:'#app',
+        data:{
+            treelist:treelist
+        },
+    
+    })
+</script>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        html,body{
+            height: 100vh;
+        }
+        #app{
+            height: 100vh;
+            display: flex;
+            flex-direction: row;
+        }
+        textarea,div.content{
+            width: 50%;
+            height: 100vh;
+            padding: 2rem;
+            border: 1px soid #4d4d4d;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <textarea v-model="message"></textarea>
+        <div class="content" v-html="content"></div>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:'#app',
+        data:{
+            message:""
+        },
+        computed: {
+            content:function(){
+                return marked(this.message);
+            }
+        },
+    })
+</script>
+</html>

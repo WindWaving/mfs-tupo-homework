@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Vue</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <slotprac>
+            <template v-slot:content>
+                <div>自定义slot部分</div>
+            </template>
+        </slotprac> -->
+        <retemp></retemp>
+    </div>
+</body>
+<script>
+    // Vue.component('slotprac', {
+    //     template: '<div><header>Header</header><div><slot name="content"></slot></div><footer>Footer</footer></div>'
+    // })
+    // Vue.mixin({
+    //     option: "created",
+    //     created: function () {
+    //         console.log(this.$options.option);
+    //     }
+    // })
+    Vue.component('retemp', {
+        render: function (createElement){
+            console.log(this.message)
+            if(this.message.length!=0){
+                return createElement('div', [
+                createElement('h1', "I'm a template"), 
+                createElement('p',{
+                    domProps:{
+                        innerHTML:this.message
+                    }
+                })           
+            ])
+            }else{
+                return createElement('div',[
+                    createElement('h1',"I'm a template"),
+                    createElement('p','No message')
+                ])
+            }
+            
+        },
+        data() {
+        return {
+            message: ""
+        }
+    },
+    })
+    new Vue({
+        el: '#app',
+    })
+</script>
+
+</html>

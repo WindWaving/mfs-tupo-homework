@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue-transition</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <style>
+        button{
+            background: white;
+            color: black;
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            margin: 1rem;
+        }
+        span{
+            font-size: 2rem;
+        }
+        .number-enter-active{
+            transition: all 2s ease;
+        }
+        .number-enter,.number-leave{
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button @click="add">Add</button>
+        <button @click="remove">Remove</button>        
+        <transition name="number" v-for="item in list">
+            <span>{{item}}</span>
+        </transition>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            list:[1,2,4,5]
+        },
+        methods: {
+            add:function(){
+                this.list.push(Math.ceil(Math.random()*15));
+            },
+            remove:function(){
+                this.list.pop();
+            }
+        },
+    })
+</script>
+</html>

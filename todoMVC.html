@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <style>
+        li {
+            list-style: none;
+        }
+
+        .finished {
+            color: #6e6e6e;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <input type="checkbox" v-model="selectAll">
+        <input type="text" v-model="inputTodo" @keyup.enter="addtoList">
+        <ul>
+            <li v-for="(item,index) in filterlist" :class="item.finished?'finished':''">
+                <input type="checkbox" v-model="item.finished">
+                {{item.todo}}
+                <button @click="delItem(index)">X</button>
+            </li>
+        </ul>
+        <span>{{leftnum}} items left</span>
+        <button @click="actBtn='all'">All</button>
+        <button @click="actBtn='active'">Active</button>
+        <button @click="actBtn='completed'">Completed</button>
+        <button @click="deleteAll">Deleta All</button>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            todolist: [],
+            inputTodo: "",
+            actBtn: "all",
+            selectAll: false,
+        },
+        methods: {
+            addtoList: function () {
+                let obj = {};
+                obj.todo = this.inputTodo;
+                obj.finished = false;
+                this.todolist.push(obj);
+                this.inputTodo = "";
+            },
+            delItem: function (index) {
+                this.todolist.splice(index, 1);
+            },
+            deleteAll: function () {
+                this.todolist = [];
+            }
+        },
+        computed: {
+            filterlist: function () {
+                if (this.actBtn == "all") {
+                    return this.todolist;
+                } else if (this.actBtn == "active") {
+                    return this.todolist.filter(item => !item.finished);
+                } else {
+                    return this.todolist.filter(item => item.finished);
+                }
+            },
+            leftnum: function () {
+                return this.todolist.filter(item => !item.finished).length;
+            }
+        },
+        watch: {
+            selectAll: function () {
+                if (this.selectAll) {
+                    this.todolist = this.todolist.map(item => {
+                        item.finished = true;
+                        return item;
+                    })
+                }else{
+                    this.todolist = this.todolist.map(item => {
+                        item.finished = false;
+                        return item;
+                    })
+                }
+            }
+        },
+
+    })
+</script>
+
+</html>
