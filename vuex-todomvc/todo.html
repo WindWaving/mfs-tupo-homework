@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList</title>
+    <script src="vue.js"></script>
+    <script src="vuex.js"></script>
+    <style>
+        li {
+            list-style: none;
+        }
+
+        .finished {
+            color: #6e6e6e;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <input type="checkbox" v-model="selectAll">
+        <input type="text" v-model="inputTodo" @keyup.enter="addtoList">
+        <ul>
+            <li v-for="(item,index) in filterlist" :class="item.finished?'finished':''">
+                <input type="checkbox" v-model="item.finished">
+                {{item.todo}}
+                <button @click="delItem(index)">X</button>
+            </li>
+        </ul>
+        <span>{{leftnum}} items left</span>
+        <button @click="actBtn='all'">All</button>
+        <button @click="actBtn='active'">Active</button>
+        <button @click="actBtn='completed'">Completed</button>
+        <button @click="deleteAll">Deleta All</button>
+    </div>
+</body>
+<script>
+        const store=new Vuex.Store({
+        state:{
+            todoList:[],          
+        },
+        mutations:{
+            addtoList(state,item){
+                state.todoList.push(item);
+            },
+            deleteAll:(state)=>{
+                state.todoList=[];
+            },
+            delItem:(state,index)=>{
+                var item=state.todoList.splice(index,1);
+            },
+            doneAll:(state,done)=>{
+                if(done){
+                    state.todoList.map(item=>item.finished=true);
+                }else{
+                    state.todoList.map(item=>item.finished=false);
+                }
+            }
+        },
+        getters:{
+            filt:(state)=>(condition)=>{
+                if (condition == "all") {
+                    return state.todoList;
+                } else if (condition == "active") {
+                    return state.todoList.filter(item => !item.finished);
+                } else {
+                    return state.todoList.filter(item => item.finished);
+                }
+            },
+            doneTodos:(state)=>{
+                return state.todoList.filter(item=>!item.finished).length;
+            }
+        }
+    })
+    new Vue({
+        el:'#app',
+        data:{
+            inputTodo:'',
+            actBtn:'all',
+            selectAll:false
+        },
+        store:store,
+        methods: {
+            addtoList:function(){
+                var item={};
+                item.todo=this.inputTodo;
+                item.finished=false;
+                store.commit('addtoList',item);
+                this.inputTodo="";
+            },
+            deleteAll:()=>{
+                store.commit('deleteAll');
+            },
+            delItem:(index)=>{
+                store.commit('delItem',index);
+            }
+        },
+        computed: {
+            filterlist:function(){
+                return store.getters.filt(this.actBtn);
+            },
+            leftnum:function(){
+                return store.getters.doneTodos;
+            }
+        },
+        watch: {
+            selectAll: function () {
+                store.commit('doneAll',this.selectAll);
+            }
+        },
+    })
+
+
+</script>
+
+</html>
