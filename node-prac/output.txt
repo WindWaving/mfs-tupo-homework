@@ -1,0 +1,6 @@
+------WebKitFormBoundaryToz1mUF30xByM1x9
+Content-Disposition: form-data; name="file%0A"; filename="test.txt"
+Content-Type: text/plain
+
+这是一个测试输入流的文件
+------WebKitFormBoundaryToz1mUF30xByM1x9--

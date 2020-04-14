@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>表单提交</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  <style>
+    div,
+    button,
+    span {
+      font-size: 30px;
+    }
+
+    input {
+      line-height: 30px;
+    }
+
+    button {
+      padding: 10px 20px;
+    }
+
+    .check,
+    .checkuser,
+    .userwrong,
+    .checkpwd,
+    .save {
+      display: none;
+    }
+
+    .show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <form>
+    <div>
+      <label for="username">用户名：</label>
+      <input type="text" id="username" name="username" pattern="^[a-zA-Z]\w{5,17}$" onblur="userCheck()">
+      <span class="checkuser">该用户名已经注册</span>
+      <span class="userwrong">用户名应该为6-18位且由字母开头</span>
+    </div>
+    <div>
+      <label for="password">密码：</label>
+      <input type="password" id="password" name="password" maxlength="18" minlength="6" oninput="pwdCheck()">
+      <span class="checkpwd">密码长度应在6-18位</span>
+    </div>
+    <div>
+      <label for="pwd-rpt">重复密码：</label>
+      <input type="password" id="pwd-rpt" name="pwd-rpt" minlength="6" maxlength="18" oninput="pwdRptCheck()">
+      <span class="check">两次密码不匹配</span>
+    </div>
+    <div>
+      <span class="save">保存成功</span>
+    </div>
+    <button type="button" onclick="post()">提交</button>
+  </form>
+</body>
+
+<script>
+  function userCheck() {
+    $('.save').removeClass('show')
+    $name = $("#username").val();
+    var pattern = new RegExp("^[a-zA-Z]\\w{5,17}$");
+    if (!$name.match(pattern)) {
+      $(".userwrong").addClass("show");
+      return false;
+    } else {
+      $(".userwrong").removeClass("show");
+      if (sessionStorage.getItem($name) != null) {
+        console.log(sessionStorage.getItem($name));
+        $(".checkuser").addClass("show");
+        return false;
+      } else {
+        console.log(sessionStorage.getItem($name));
+        $(".checkuser").removeClass("show");
+        return true;
+      }
+    }
+
+  }
+  function pwdCheck() {
+    $('.save').removeClass('show')
+    var $pwd = $("#password").val();
+    if ($pwd.length < 6 || $pwd.length > 18) {
+      $(".checkpwd").addClass("show");
+      console.log($pwd.length);
+      return false;
+    } else {
+      $(".checkpwd").removeClass("show");
+      return true;
+    }
+  }
+  function pwdRptCheck() {
+    $('.save').removeClass('show')
+    var $pwd = $("#password").val();
+    var $rpwd = document.getElementById("pwd-rpt")
+    if ($rpwd.value != $pwd) {
+      $rpwd.setCustomValidity("两次密码不匹配");
+      $(".check").addClass("show");
+      return false;
+    } else {
+      $(".check").removeClass("show");
+      $rpwd.setCustomValidity("");
+      return true;
+    }
+  }
+  $("#username").blur(function () {
+    var user = $("#username").val();
+    $.ajax({
+      url: "http://localhost:3000/check",
+      data: {
+        username: user
+      },
+      method: "POST",
+      success: function (data) {
+        console.log(data);
+        if(data=="invalid"){
+          $('.checkuser').addClass('show');
+        }else{
+          $('.checkuser').removeClass('show');
+        }
+      }
+    })
+  })
+  function post() {
+    if (userCheck() && pwdCheck() && pwdRptCheck()) {
+      var user = $("#username").val();
+      var pwd = $("#password").val();
+      $.ajax({
+        url: "http://localhost:3000/save",
+        data: {
+          username: user,
+          password: pwd
+        },
+        method: "POST",
+        success: function (data) {
+          console.log(data);
+          $('.save').addClass('show');
+          $(".save").text(data);
+        }
+      })
+    } else {
+      alert("表单填写有误")
+    }
+  }
+</script>
+
+</html>

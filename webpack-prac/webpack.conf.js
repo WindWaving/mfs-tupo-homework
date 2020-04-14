@@ -26,6 +26,7 @@ module.exports = {
             }
         ]
     },
+    //自动刷新插件webpack-dev-server
     devServer: {
         contentBase: 'src'
     },

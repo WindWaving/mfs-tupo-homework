@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  <style>
+      form div{
+        float: left;
+        margin: 50px;
+      }
+      form div select{
+        width: 150px;
+        height: 50px;
+        line-height: 50px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <form>
+      <div>
+        <label for="prov">省：</label>
+        <select name="prov" id="prov">
+          <option value="省份" selected>省份</option>
+        </select>
+      </div>
+      <div>
+        <label for="city">市：</label>
+        <select name="city" id="city">
+          <option value="城市" selected>城市</option>
+        </select>
+      </div>
+      <div>
+        <label for="town">区/县：</label>
+        <select name="town" id="town">
+          <option value="区县" selected>区县</option>
+        </select>
+      </div>
+    </form>
+  </body>
+  <script>
+    function loadProv() {
+      $.ajax({
+        url: "http://localhost:3000/province",
+        success: function (data) {
+          for (var i = 0; i < data.length; ++i) {
+            var $opt = $("<option value='" + data[i].region.name + "'>" + data[i].region.name + "</option>");
+            $("#prov").append($opt);
+          }
+        }
+      })
+      loadCity();
+    }
+    function loadCity() {
+      $("#prov").change(function () {
+        $("#city").html("<option value='城市' selected>城市</option>");
+        var $province = $("#prov").val();
+        $.ajax({
+          url: "http://localhost:3000/city",
+          method: "post",
+          data: {
+            province: $province
+          },
+          success: function (data) {
+            console.log(data);
+            for (var i = 0; i < data.length; ++i) {
+              var $opt = $("<option value='" + data[i].name + "'>" + data[i].name + "</option>");
+              $("#city").append($opt);
+            }
+          },
+          error: function (e) {
+            console.log(e);
+          }
+        })
+      })
+      loadTown();
+    }
+    function loadTown() {
+      $("#city").change(function () {
+        $("#town").html("<option value='区县' selected>区县</option>");
+        var $province = $("#prov").val();
+        var $city = $("#city").val();
+        console.log($city);
+        $.ajax({
+          url: "http://localhost:3000/town",
+          method: "post",
+          data: {
+            city: $city,
+            province: $province
+          },
+          success: function (data) {
+            console.log(data);
+            for (var i = 0; i < data.length; ++i) {
+              var $opt = $("<option value='" + data[i].name + "'>" + data[i].name + "</option>");
+              $("#town").append($opt);
+            }
+          },
+          error: function (e) {
+            console.log(e);
+          }
+        })
+      })
+    }
+    loadProv();
+  </script>
+  
+  </html>
