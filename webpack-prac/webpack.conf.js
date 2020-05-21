@@ -26,9 +26,13 @@ module.exports = {
             }
         ]
     },
-    //自动刷新插件webpack-dev-server
-    devServer: {
-        contentBase: 'src'
+    resolve: {
+        //  第一项空字符串必不可少，否则报模块错误
+        extensions: ['', '.es6']
     },
+    // //自动刷新插件webpack-dev-server
+    // devServer: {
+    //     contentBase: 'src'
+    // },
     plugins: [new HtmlWebpackPlugin({ template: "src/index.html" })]
 }
